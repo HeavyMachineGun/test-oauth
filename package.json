@@ -1,0 +1,26 @@
+{
+  "name": "github-oauth2",
+  "version": "1.0.0",
+  "description": "test oauth2-github",
+  "main": "index.js",
+  "scripts": {
+    "test": "test",
+    "start": "node index.js"
+  },
+  "keywords": [
+    "oauth2",
+    "git",
+    "user-authentication"
+  ],
+  "author": "Nestor Mejia Perez",
+  "license": "ISC",
+  "dependencies": {
+    "axios": "^0.27.2",
+    "cookie-session": "^2.0.0",
+    "crypto": "^1.0.1",
+    "dotenv": "^16.0.1",
+    "express": "^4.18.1",
+    "express-session": "^1.17.3",
+    "pug": "^3.0.2"
+  }
+}
