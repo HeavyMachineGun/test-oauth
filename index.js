@@ -8,6 +8,12 @@ const port = 8080;                  //Save the port number where your server wil
 const path = require("path");
 const { env } = require('process');
 const router = express.Router();
+
+
+app.use(express.static(__dirname + '/node_modules/bootstrap/dist'));
+app.use(express.static(__dirname + '/node_modules/jquery/dist'));
+
+
 app.use(session({
     // secret: "test session secret",
     // resave: false,
@@ -50,7 +56,12 @@ function getHashCode(){
     const randomHash = crypto.randomBytes(20).toString('hex');
     return randomHash;
 }
+function toQueryString(object){
+    return Object.keys(object)
+                    .map(key => `${key}=${object[key]}`)
+                    .join('&');
 
+}
 router.get('/login', (req, res) => {        //get requests to the root ("/") will route here
     req.session.auth_code ??= getHashCode();
     const code =  req.session.auth_code;
@@ -61,9 +72,7 @@ router.get('/login', (req, res) => {        //get requests to the root ("/") wil
         scope: "user public_repo",
         state: code
     }
-    const qs = Object.keys(payload)
-                    .map(key => `${key}=${payload[key]}`)
-                    .join('&');
+    const qs = toQueryString(payload);
     
     res.redirect(GIT_HUB.authorizeURL +"?"+qs);
     
@@ -94,6 +103,21 @@ router.get('/logedIn', async (req, res) => {        //get requests to the root (
     res.redirect("/");
 });
 
+router.get("/user/repository/all",async (req,res)=>{
+    const authToken = req.session.access_token;
+    const payload = {
+        sort: "created",
+        direction : "desc",
+    };
+    const qs = toQueryString(payload);
+    var response = await axios.get(GIT_HUB.apiUrlBase+"user/repos?"+qs,{
+        headers : {
+            "Authorization": "Bearer "+authToken
+        }
+    });
+    console.log(Object.keys(response));
+    res.json(response.data);
+});
 app.use("/", router);
 app.listen(port, () => {            //server starts listening for any attempts from a client to connect at port: {port}
     console.log(`Now listening on port ${port}`); 
